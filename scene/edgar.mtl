@@ -1,0 +1,105 @@
+newmtl Pants
+Ns 30
+Ka 0 0 0
+Kd 0.101961 0 0.46273
+Ks 0.0588083 0.0588083 0.0588083
+map_Kd EdgarM.jpg
+newmtl Shirt
+Ns 30
+Ka 0 0 0
+Kd 1 1 1
+Ks 0.0588083 0.0588083 0.0588083
+map_Kd EdgarM.jpg
+newmtl Tie
+Ns 30
+Ka 0 0 0
+Kd 0.619608 0.0823529 0
+Ks 0.0588083 0.0588083 0.0588083
+map_Kd EdgarM.jpg
+newmtl Skin
+Ns 30
+Ka 0 0 0
+Kd 1 1 1
+Ks 0.0588083 0.0588083 0.0588083
+map_Kd EdgarM.jpg
+newmtl Collar
+Ns 30
+Ka 0 0 0
+Kd 1 1 1
+Ks 0.0588083 0.0588083 0.0588083
+map_Kd EdgarM.jpg
+newmtl Tooth
+Ns 30
+Ka 0 0 0
+Kd 1 1 1
+Ks 0.0588083 0.0588083 0.0588083
+map_Kd EdgarM.jpg
+newmtl Tongue
+Ns 30
+Ka 0 0 0
+Kd 0.952926 0.505852 0.615656
+Ks 0.0588083 0.0588083 0.0588083
+map_Kd EdgarM.jpg
+newmtl InnerMouth
+Ns 30
+Ka 0 0 0
+Kd 0.956863 0.541146 0.647059
+Ks 0.0588083 0.0588083 0.0588083
+map_Kd EdgarM.jpg
+newmtl EyeWhite
+Ns 30
+Ka 0 0 0
+Kd 1 1 1
+Ks 1 1 1
+map_Kd EdgarM.jpg
+newmtl EyeBrow
+Ns 30
+Ka 0 0 0
+Kd 0.501961 0.25095 0.25095
+Ks 0.0588083 0.0588083 0.0588083
+map_Kd EdgarM.jpg
+newmtl EyeLid
+Ns 30
+Ka 0 0 0
+Kd 1 0.847059 0.717647
+Ks 0.0588083 0.0588083 0.0588083
+map_Kd EdgarM.jpg
+newmtl Pupil
+Ns 30
+Ka 0 0 0
+Kd 0.0588083 0.0588083 0.0588083
+Ks 1 1 1
+map_Kd EdgarM.jpg
+newmtl Sleeve
+Ns 30
+Ka 0 0 0
+Kd 1 1 1
+Ks 0.0588083 0.0588083 0.0588083
+map_Kd EdgarM.jpg
+newmtl Glove
+Ns 30
+Ka 0 0 0
+Kd 1 0.847059 0.717647
+Ks 0.0588083 0.0588083 0.0588083
+map_Kd EdgarM.jpg
+newmtl Shoe
+Ns 30
+Ka 0 0 0
+Kd 0.141161 0 0
+Ks 0.0588083 0.0588083 0.0588083
+map_Kd EdgarM.jpg
+newmtl Glasses
+Ns 30
+Ka 0 0 0
+Kd 0.054902 0.054902 0.054902
+Ks 0.160784 0.160784 0.160784
+newmtl Lens
+Ns 30
+Ka 0 0 0
+Kd 0.988235 0.988235 0.988235
+Ks 0.988235 0.988235 0.988235
+newmtl Preview
+Ns 30
+Ka 0 0 0
+Kd 0.811765 0.811765 0.811765
+Ks 0 0 0

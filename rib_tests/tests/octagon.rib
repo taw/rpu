@@ -1,0 +1,21 @@
+# four constant polygons
+
+Display "octagon.tiff" "file" "rgb"
+
+Format 320 320 1
+Projection "perspective" "fov" 90
+
+WorldBegin
+
+Surface "constant"
+
+Color 1.0 1.0 1.0
+Polygon "P" [ 0  0  2    0  1  3    1  0  3]
+Color 1.0 0.5 1.0
+Polygon "P" [ 0  0  2    1  0  3    0 -1  3]
+Color 0.5 1.0 1.0
+Polygon "P" [ 0  0  2    0 -1  3   -1  0  3]
+Color 0.5 0.5 1.0
+Polygon "P" [ 0  0  2   -1  0  3    0  1  3]
+
+WorldEnd

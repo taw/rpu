@@ -1,0 +1,48 @@
+This directory contains a complete hardware emulator.
+
+Conceptually it consists of two parts.
+* The vm, which accepts low-level commands (load an object,
+  shot a ray etc.). It corresponds more or less directly
+  to the interface to the actual hardware.
+* The "standard" driver, that sits between the compiler and the vm.
+  It does things like parsing scene descriptions,
+  support for testing, debugging etc.
+  Alternative drivers do the vm tests.
+
+dynArray.ml and dynArray.mli taken from extlib (with enum code removed)
+
+=== Files ===
+Makefile		- the Makefile
+README			- quick overview
+
+asm.ml			- assembler main
+asm_ast.ml		- shader opcodes on asm ast level (TODO: partially merge with opcodes.ml)
+asm_lexer.mll		- asm lexer
+asm_parser.mly		- asm parser
+build_kdtree.ml		- parse object description and build kdtree for it 
+build_kdtree_obj.ml	- parse object description and build kdtree for it (accepts different input format)
+import_obj.pl		- parser for OBJ format, its output is then fed to build_kdtree_obj.ml
+decompile_kdtree.ml	- print out compiled kdtree for debugging
+driver.ml		- common driver functions, used by test*.ml
+dynArray.ml		- arrays of dynamic size
+dynArray.mli		- arrays of dynamic size (interface)
+hardware.ml		- object tree traversal
+intersection_tests.ml	- intersection test algorithms (ray/bb and ray/triangle)
+math3.ml		- 3-element vector mathematics
+memory.ml		- memory interface
+opcodes.ml		- shader opcodes
+vm.ml			- virtual machine
+
+test1.ml		- test 1 - trace + memory
+test2.ml		- test 2 - vm
+test3.ml		- test 3 - texture access
+test4.ml		- test 4 - depth-shaded bunny (kdtree compiler, scene loading)
+test5.ml		- test 5 - depth-shaded bunny (asm loading)
+test6.ml		- test 6 - phong-shaded bunny (more asm)
+test7.ml		- test 7 - TRACE shooting of primary rays
+test8.ml		- test 8 - Edgar (mesh without any normal or texture info)
+test9.ml		- test 9 - Edgar (mesh + interpolated normals, no texture info used)
+
+depth.asm		- depth shader (primary rays shot by the driver)
+phong.asm		- Phong shader (primary rays shot by the driver)
+phong_trace.asm		- Phong shader (primary rays shot by the shader)

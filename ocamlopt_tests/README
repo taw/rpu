@@ -1,0 +1,30 @@
+This is a test of OCaml code generator for 6 implementations
+of 3-element float vectors.
+
+* tuple 
+* object
+* array
+* array without bound checking
+* array without bound checking, encapsulated in a module
+* record
+
+The results for get_{x,y,z}:
+* code generated for record and array w/o bound checking versions is reasonably efficient
+* surprisingly, code generated for encapsulated arrays is outrageously inefficient
+* code generated for tuple and general array versions is somewhat inefifcient
+* code generated for object version is outrageously inefficient
+
+The results for geti (only arrays and records):
+* code generated for arrays is efficient
+* naive code generated for vectors is reasonable
+
+The results for unsafe_geti (only arrays and records):
+* code generated for arrays is efficient
+* code generated for records using Obj magic does not inline efficiently
+
+Conclusion:
+* arrays w/o bound checking are pretty ugly,
+  and encapsulating them seems to be breaking inlining,
+  so it's probably better to use records
+* arrays w/o bound checking have one advantage over records -
+  it's possible to use indexed access, map function etc. on them

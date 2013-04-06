@@ -1,0 +1,14 @@
+task :clean do
+    files = Dir.glob("*").grep(/^\d+.(sl|ir|asm|shr|epts|pnm)/)
+    files.each{|file| File.delete file}
+    rm_f "coverage.data"
+end
+
+task :coverage do
+    sh "./tests.rb --coverage"
+    sh "rcov --aggregate coverage.data ../codegen/codegen.rb -- -h"
+end
+
+task :test do
+    sh "./tests.rb"
+end

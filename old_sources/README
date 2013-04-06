@@ -1,0 +1,12 @@
+Some notes on the structure of the code.
+
+The code consists of 2 pieces.
+* Assembler
+* Raytracer
+
+Assembler's main function is in rpuasm.ml
+* load the asm source
+* convert to token stream by lexer.mll (defined in parser.mly and ast.mli)
+* parse into an syntax tree by parser.mly (defined in ast.mli)
+* convert into a compiled shader by rpuasm.ml's convert_shader
+* print in a Ocaml's standand marshaled data format

@@ -1,0 +1,348 @@
+=== Quick overview ===
+
+The code consists of:
+* virtual machine that emulates RPU hardware
+* RPU assembler
+* compiler of RenderMan Shading Language shaders to RPU assembly code
+
+=== Structure of the repository ===
+
+Important directories in the repository:
+* doc               - Documentation
+* hardware_emulator - assembler and virtual machine
+* slcompiler        - SL compiler
+
+Other directories contain auxiliary code, auxiliary data, tests,
+obsolete code etc.
+
+To avoid introducing unnecessary compile-time dependencies,
+some foreign code is included in the repository:
+* OCamlMakefile            - from OCamlMakefile
+* dynArray.ml dynArray.mli - from ExtLib
+
+=== Build system ===
+
+The build system is based on OCamlMake.
+For each binary, Makefile lists required source files in the correct order.
+Handling of dependencies between source files, switching between native code
+and byte code compilation and other low-level tasks are handled by OCamlMake.
+
+It is very straightforward to use for single-binary Makefiles,
+like in slcompiler/ directory.
+
+Using it for multi-binary Makefiles like in hardware_emulator/
+requires a bit more work.
+
+Example (from slcompiler/):
+  # SOURCES variable 
+  SOURCES=ast.mli ast2.mli dynArray.ml util.ml codegen.ml print_ast2.ml compiler_state.ml \
+          expand_ast.ml parser.mly lexer.mll ssa.ml compile.ml main.ml
+  # Name of the binary output
+  RESULT=slcompiler
+
+  # Default compilation mode (should be native-code due to speed requirements)
+  # OCamlMakefile defaults to byte-code otherwise
+  all: native-code
+
+  # include OCamlMakefile
+  include OCamlMakefile
+
+OCamlMakefile file is included in each directory in which it is used to
+avoid introducing extra dependencies.
+
+=== Coding issues ===
+
+WARNING: During development of the codebase the architecture had to evolve,
+         so different parts use slightly different style.
+         Such differences are mentioned explicitly.
+
+==== Variant types ====
+
+The code consistently uses OCaml polymorphic variant types (`FOO) for
+most of the data structures.
+
+The only case where SML-style variant types (FOO) are as type markers.
+For example hash table and set types are both implemented internally
+using Hashtbl.t from the standard library. To avoid accidentally
+mixing them, but still allow explicit access to the implementation
+when required, they are implemented as:
+  type ('a,'b) ht  = HT of ('a,'b) Hashtbl.t
+  type 'a set = SET of ('a,unit) Hashtbl.t
+Using polymorphic variant types would make the type error messages
+much more complex, without any benefit. As polymorphic variant types
+and traditional variant types are used for completely different purposes,
+using both does not cause consistency problems.
+
+==== Resizable arrays ====
+
+A very common data structures that is present in virtually all other
+programming languages but is curiously missing from the OCaml standard library
+are resizable arrays.
+
+This ommission has been fixed by OCaml ExtLib [1], which implements
+DynArray.t type of resizable arrays.
+
+Such arrays are used throughout the code.
+
+To avoid introducing extra dependencies, copies of dynArray.ml\
+and dynArray.mli are present in each directory in which they
+are used. Enum-related parts of them have been cut, as
+they are unused, and keeping them would require also including
+enum-related parts of ExtLib.
+
+References:
+* [1] - http://ocaml-lib.sourceforge.net/
+
+==== util.ml ====
+
+NOTICE: Util.ml is used only in slcompiler/ part of the codebase,
+        not in hardware_emulator/
+
+util.ml groups small general-purpose code used by many different
+parts of the code. Conceptually it can be considered an extension
+of the standard library.
+
+Two main parts of util.ml:
+* Common (usually high-order) functions over normal data types
+  like list_iteri (list equivalent of analogous to Array.iteri).
+* Thin layer over existing data types that make their usage more
+  concide, more convenient, and significantly less error-prone.
+  4 such types are introduces:
+  * 'a da - resizable arrays, simply an alias to 'a DynArray.t,
+    with da_* functions that are easier to type. It also introduces
+    a few new high-level functions, like da_imperative_map
+  * ('a,'b) ht  - hash tables in which for each key there is
+                  0 or 1 value
+  * ('a,'b) mht - hash tables in which for each key there is
+                  arbitrary number of values (0, 1 or more)
+  * 'a set      - sets of values in 'a, implemented internally as
+                  hash tables from 'a to unit
+
+ht, mht, and set types are implemented as thin wrappers over
+standard library's Hashtbl.t.
+
+The new hash table types are very important. as Hashtbl.t
+mixes single-valued hash tables with multiple-valued hash tables,
+what is extremely error prone. Interfaces introduced by util.ml
+are also much simpler and more consistent with other data types,
+for example using standard naming ht_get/ht_set instead of unusally
+name like Hashtbl.find Hashtbl.replace.
+
+Some common functions like ht_keys (get all keys from the hash table)
+are also implemented.
+
+==== Printing ====
+
+The codebase uses OCaml type-safe sprintf for most of string
+construction needs, very rarely using the cumbersome procedure of
+building strings using concatenation operator ^.
+
+Most types have corresponding x_to_string: x -> string functions,
+typically implemented using sprintf.
+
+==== Error handling ====
+
+Can't-happen/not-implemented-yet and some other errors typically
+use sprintf and such functions to build error messages.
+Kind of the error is usually specified like:
+  failwith (sprintf "Error type: details" ...)
+to make it immediately apparent whether the exception is due to
+a broken assumption in a code (that is a bug), a feature that
+hasn't been implemented yet, or an error in user input or runtime
+environment.
+
+Examples:
+  failwith (sprintf "Internal error: phi-in on %s is undefined" edge#to_s);
+  failwith "FIXME: texture access not implemented yet"
+  failwith (sprintf "Input error: Variable %s not known" s)
+
+The code avoids throwing out standard errors like Not_found,
+but instead always tries to catch them and rethrow an exception
+with a relevant message.
+
+The reason for that is that in OCaml the exceptions do not carry
+stack backtrace, so getting such an exception gives almost no
+information about type of the problem (coding error, input error etc.)
+and source of the problem (which function raised it).
+
+For this reason, uncatched exceptions like Not_found, Not_unique etc.
+should be considered bugs.
+
+==== Vectors ====
+
+There are two data types that implement vectors.
+
+Most of the code uses 3-element immutable vectors implemented by
+Math3 module.
+
+Math3 implements vectors as OCaml records, as the test have shown
+that it is the most efficient of the available implementations (tuples,
+objects, 3-element arrays). The tests for that are in ocamlopt_tests/ directory.
+
+The important operations all have infix form are suffixed by &:
+* +& addition
+* -& subtraction
+* *& division by a scalar
+* /& multiplication by a scalar
+* *.& dot product
+* *^& scalar product
+
+& is necessary because OCaml does not have operator overloading.
+
+In OCaml all syntactic properties of the infix operators (operator precedence,
+left/right associativity) depend on its first characters, therefore all multiplication-like
+operations start with *. Operators *& *.& *^& are named to look similar
+to RenderMan Shading Language's * . ^ operators.
+
+WARNING: In RenderMan Shading Language * ^ and . operators all have different
+         precedence. In OCaml *& *.& *^& have identical precedence, equivalent
+         to precedence of * (scalar multiplication).
+
+The other vector data type are virtual machine registers.
+They are implemented as 4-element mutable records.
+
+==== Coding style ====
+
+Many functions are typed explicitly. Explicit typing of functions
+tends to make error messages more meaningful, especially those
+that deal with polymorphic variant types.
+
+In pattern matching, the optional | before the first case
+is always used:
+  let vti_to_string : vec_type -> string
+  = function
+  |`POINT  -> "point"
+  |`VECTOR -> "vector"
+  |`NORMAL -> "normal"
+This makes definition look more coherent and makes it easier
+to rearrange the cases.
+
+=== Assembler ===
+
+Assembler is located in hardware_emulator/ directory.
+This setup is more convenient than keeping it separate,
+as it shares many data structures with the virtual machine.
+
+The main function is implemented in ast.ml.
+First it parses input options:
+* -i <file> - input file (by default stdin)
+* -o <file> - output file (by default stdout)
+* --ast     - don't output the compiled assemby, just print the parsed assembly code.
+              It is more or less equivalent to the input.
+
+The the input is lexer by asm_lexer.mll,
+and parsed by asm_parser.mly to format defined in asm_ast.ml
+
+Then either (if --ast option is used) it is printed out,
+or converted to a format acceptable by a virtual machine (and defined in opcodes.ml),
+serialized using OCaml's output_value, and printed out to stdout or the file
+selected by -o option.
+
+Internal formats for representing assembly code used in asm_ast.ml and opcodes.ml
+are similar but not identical. The main reason was that assembler and virtual
+machine were coded separately and connected only later.
+
+WARNING: Serialization in OCaml seems to be highly fragile.
+         If the program that serialized the data used one opcodes.cmx,
+         and the program that reads and deserializes the date uses
+         another (even if compiled from identically-looking source) opcodes.cmx,
+         the deserialization may fail.
+         For that reason the assembler (which serializes) and the virtual machine
+         (which deserializes) should be compiled together.
+
+=== Virtual machine ===
+
+Virtual machine is implemented not as a program, but as a library.
+The only binaries that use it are test binaries test<number>.
+
+This is designed so on purpose, as vm represents only the actual
+hardware, and the actual programs only use the hardware.
+
+Low-level functions (that correspond to the hardware) are
+implemented in vm.ml
+
+High-level functions (that correspond to driver for the hardware)
+are implemented in driver.ml
+
+In programs that use the virtual machine, the vm is instantiated
+by calling vm_new from vm.ml. Then driver functions like vm_load_scene
+and vm_load_asm are used to load the scene data and code.
+
+A single ray is casted using vm_run_shader from vm.ml.
+Before calling it, vm should be reset to the correct state.
+After the function returns, the results can be read from its registers.
+
+All test drivers save the rendered images to PNM files, usually named
+test<number>.pnm.
+
+=== Compiler ===
+
+The compiler code is located in slcompiler/. It compiles a subset of
+RenderMan Shading Language to RPU assembly. The assembly code may
+then be compiled to the vm bytecode or rpu binary by an assembler.
+
+The compiler proceeds in stages:
+* the main function is in main.ml
+* parsing arguments, to decide what file to read
+* lexing, lexer.mll (text file -> lexeme stream)
+* parsing, parser.mly (lexeme stream -> ast)
+* compiling the code, compile.ml (ast -> internal representation)
+* generating the assembly from compiled code, codegen.ml (internal representation -> assembly)
+* printing out the result
+
+==== Compiling AST to internal representation ====
+
+The main function that does the compilation is compile in compile.ml.
+The compiler takes one function/shader at time.
+
+Because maintaining compiler state is difficult,
+it has been encapsulated in an object-oriented interface
+coded in compiler_state.ml.
+
+For each function/shader, the stages of compilation are:
+* Create a new compiler state object (compiler_state.ml),
+* Initialize the compiler state based on the function/shader type,
+  functions parameters etc.
+* Convert AST to the internal representation, expand_ast.ml.
+  This is a naive conversion, the code is very inoptimal and not
+  in SSA form yet.
+* Run the optimizations:
+  * Eliminate some of the useless NOPs
+  * Unreachable code elimination [1]
+  * Convert to SSA form, ssa.ml
+  * Do copy propagation in SSA form
+  * Eliminate useless temporaries
+  * (more optimizations can be added here)
+  * Eliminate some of the useless NOPs
+  * Unreachable code elimination
+ 
+[1] - SSA transform as coded requires all code to be reachable (under assumption that either
+      branch of each if/while can be taken), but some source code constructs generate unreachable code,
+      for example:
+         while(...) {
+           a();
+           continue;
+           b(x); // unreachable code, so no definition of x reaches this point, SSA dies
+         }
+      For this reason unreachable code elimination is run before transformation to SSA form.
+
+SSA form makes it easy to extend the compiler with optimizations, like
+Global Value Numbering, Sparse Conditional Constant Propagation etc.
+
+Another important optimization that is not performed is constant folding.
+
+==== Generating code from the internal representation ====
+
+This is handled by codegen function in codegen.ml.
+
+WARNING: This part of the compiler is incomplete.
+
+* Generate instructions, using virtual registers
+* Group instructions into basic blocks, to get rid of some jumps
+* Classify virtual registers as constant, single-use, etc.
+* Run a peephole optimizer to reduce register pressure
+* Extract information for register allocation
+* Allocate registers
+* Remove extra MOVs
+* (Schedule instructions)
+* Do low-level optimizations using a peephole optimizer

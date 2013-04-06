@@ -1,0 +1,4 @@
+This is just a benchmark/test of various marshalling methods.
+The result:
+* XML is too slow
+* input_value/output_value has acceptable speed

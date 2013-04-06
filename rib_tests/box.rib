@@ -1,0 +1,53 @@
+#
+# Tester for KTcanvasI.sl shader
+#
+
+Option "searchpath" "shader" ".:&"
+
+Display "box.tif" "tiff" "rgb"
+
+Format 512 512 -1
+
+Projection "perspective" "fov" [40]
+
+PixelSamples 1 1
+ShadingRate 1
+
+
+Imager "KTcanvasI"
+	"uniform float s_samplingrate" [0]
+	"uniform float t_samplingrate" [0]
+	"uniform string drawline" ["on"]
+	"uniform float screenw_x" [2]
+	"uniform float screenw_y" [2]
+	"uniform float fov" [40]
+	"uniform float x_res" [512]
+	"uniform float y_res" [512]
+	"uniform string dessin" ["off"]
+
+Translate 0 0 7.5
+
+WorldBegin
+	LightSource "distantlight" 1 "intensity" [0.65] "from" [1 1 -1.5] "to" [0 0 0]
+	LightSource "ambientlight" 2 "intensity" [0.8]
+
+
+	AttributeBegin
+		Translate 0 0 0
+		Rotate 0 0 0 1
+		Rotate -30 0 1 0
+		Rotate 15 1 0 0
+		Color 0.486 0.535 0.9647
+
+		AttributeBegin
+			Patch "bilinear" "P" [-1 -1 1 1 -1 1 -1 1 1 1 1 1]
+			Patch "bilinear" "P" [-1 -1 -1 1 -1 -1 -1 1 -1 1 1 -1]
+			Patch "bilinear" "P" [-1 -1 -1 -1 -1 1 -1 1 -1 -1 1 1]
+			Patch "bilinear" "P" [1 -1 1 1 -1 -1 1 1 1 1 1 -1]
+			Patch "bilinear" "P" [-1 1 1 1 1 1 -1 1 -1 1 1 -1]
+			Patch "bilinear" "P" [-1 -1 1 1 -1 1 -1 -1 -1 1 -1 -1]
+		AttributeEnd
+
+	AttributeEnd
+
+WorldEnd

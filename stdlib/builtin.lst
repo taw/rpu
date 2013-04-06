@@ -1,0 +1,91 @@
+// Builtin or not implemented
+
+float PI = 3.14159265358979;
+
+float sin(float a);
+float asin(float a);
+float cos(float a);
+float acos(float a);
+float tan(float a);
+float atan(float yoverx);
+float atan(float y, x);
+float pow(float x, y);
+float exp(float x);
+float sqrt(float x);
+float log(float x);
+float mod(float a, b);
+float floor(float x);
+float ceil(float x);
+float round(float x);
+float smoothstep(float min, max, value);
+
+float filterstep(float edge, s1; ... );
+float filterstep(float edge, s1, s2; ... );
+
+// Last argument's name depends on type
+T spline(float value; T f1, f2, ..., fn, fn1);
+T spline(string basis; float value; T f1, f2, ..., fn, fn1);
+T spline(float value; T fvals[];
+T spline(string basis; float value; T fvals[]);
+
+T Du(T p);
+T Dv(T p);
+T Deriv(T num, float den);
+
+float random();
+
+T noise(float v);
+T noise(float u, v);
+T noise(point pt);
+T noise(point pt, float t);
+
+T pnoise(float v, uniform float period);
+T pnoise(float u, v, uniform float uperiod, uniform float vperiod);
+T pnoise(point pt, uniform point pperiod);
+T pnoise(point pt, float t, uniform point pperiod, uniform float period);
+
+float xcomp(point P);
+float ycomp(point P);
+float zcomp(point P);
+
+float xcomp(vector P);
+float ycomp(vector P);
+float zcomp(vector P);
+
+float xcomp(normal P);
+float ycomp(normal P);
+float zcomp(normal P);
+
+// EXTRA
+float xcomp(color P);
+float ycomp(color P);
+float zcomp(color P);
+
+float ptlined(point Q, P1, P2);
+float rotate(point Q; float angle; point P1, P2);
+
+fresnel(vector I,Nl float eta; output float Kr, Kt);
+fresnel(vector I,Nl float eta; output float Kr, Kt; output vector R, T);
+
+point transform(string tospace; point p);
+point transform(string fromspace, tospace; point p);
+point transform(matrix m; point p);
+point transform(string fromspace; matrix m; point p);
+
+point vtransform(string tospace; vector v);
+point vtransform(string fromspace, tospace; vector v);
+point vtransform(matrix m; vector v);
+point vtransform(string fromspace; matrix m; vector v);
+
+point ntransform(string tospace; normal n);
+point ntransform(string fromspace, tospace; normal n);
+point ntransform(matrix m; normal n);
+point ntransform(string fromspace; matrix m; normal n);
+
+float depth(point P);
+
+float comp(color c; float index);
+void setcomp(output color c; float index, value);
+
+color ctransform(string fromspace, tospace; color C);
+

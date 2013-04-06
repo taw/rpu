@@ -1,0 +1,8 @@
+This file isn't very up to date. ^_^
+
+* lexer: int/float format
+* lexer: string escapes
+* parser: shift/reduce conflicts of `texture(foo[bar])' and `point "foo" - "bar"'
+* main: optional cpp
+* main: print ast
+* expand_ast: compile params

@@ -1,0 +1,20 @@
+Here's a very simple ABI for shaders.
+
+Registers are R0..R15, S:
+There is no stack, no memory, no A
+
+At input, the register values are:
+R0 - [u, v, hit_distance, 1]
+R1 - ray_origin
+R2 - ray_direction
+R3 - hit_point (=R1+R2*R0.z)
+R4 - triangle A
+R5 - triangle B
+R6 - triangle C
+R7 - triangle color
+R8 - light location
+R9..R15 = [0,0,0,1]
+S = [0,0,0,1]
+
+At output:
+R15 - color

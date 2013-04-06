@@ -1,0 +1,56 @@
+What kind of vector-like object should be returned by various operations ?
+It's not documented in the RenderMan documentation.
+
+Here are the results returned by 3delight.
+Those that seem moderately weird are marked by ?,
+those that seem seriously weird are marked by ???.
+
+v + v = v
+v + p = p
+v + n = v
+p + v = p
+p + p = p ?
+p + n = p
+n + v = v
+n + p = p
+n + n = n ?
+
+v - v = v
+v - p = p ?
+v - n = v
+p - v = p
+p - p = v
+p - n = p
+n - v = v
+n - p = p ?
+n - n = n ?
+
+v * v = v ?
+v * p = v ?
+v * n = v ?
+p * v = v ?
+p * p = p ?
+p * n = n ???
+n * v = v ?
+n * p = n ???
+n * n = n ?
+
+v / v = v ?
+v / p = v ?
+v / n = v ?
+p / v = v ?
+p / p = p ?
+p / n = n ???
+n / v = v ?
+n / p = n ???
+n / n = n ?
+
+v ^ v = n ???
+v ^ p = v
+v ^ n = v
+p ^ v = v
+p ^ p = v
+p ^ n = v
+n ^ v = v
+n ^ p = v
+n ^ n = v

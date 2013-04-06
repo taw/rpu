@@ -1,0 +1,9 @@
+#!/usr/bin/perl -w
+
+$|=1;
+for my $file(<../shaders*/*.asm>) 
+{
+    print "$file: ";
+    system "./rpuasm", "-i", $file, "-o", "/dev/null";
+    print "\n";
+}

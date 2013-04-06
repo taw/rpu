@@ -1,0 +1,4 @@
+min, max only have 2-parameter forms
+assumes color are 3-component and have {x,y,z}comp/ set{x,y,z}comp operations
+
+Not complete
