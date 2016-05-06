@@ -53,15 +53,15 @@ let scene_load_from_file : string -> (float list, float list) scene =
 fun scene_file_name ->
     let scene_file_handler = open_in scene_file_name in
     let scene = scene_new () in
-    let (vtx_cnt, tri_cnt) = Scanf.fscanf scene_file_handler "%d %d" (fun a b -> (a,b)) in
+    let (vtx_cnt, tri_cnt) = Scanf.fscanf scene_file_handler "%d %d\n" (fun a b -> (a,b)) in
     let scan_line_vtx () =
-	Scanf.fscanf scene_file_handler "%f %f %f %f %f %f %f %f" (
+	Scanf.fscanf scene_file_handler "%f %f %f %f %f %f %f %f\n" (
 	    fun x y z nx ny nz s t ->
 	    DynArray.add scene.vertices ((v3_make x y z), [nx;ny;nz;s;t])
     )
 in
     let scan_line_tri () =
-	Scanf.fscanf scene_file_handler "%d %d %d %d" (
+	Scanf.fscanf scene_file_handler "%d %d %d %d\n" (
 	    fun a b c d ->
 	    DynArray.add scene.triangles (a,b,c,d)
     )
@@ -127,7 +127,7 @@ let rec build_bb_tree_aux2 scene (bb_min,bb_max) obj_array order_x order_y order
     else if Array.length obj_array <= (!leaf_max) (* default - 4 *)
     then    let objs = List.map (fun (tri_index,_) -> T(tri_index)) (Array.to_list obj_array)
 	 in B (scene_add_bbox scene (bb_min,bb_max,objs))
-    else    
+    else
     let get_bb (_,bb) = bb
  (* cost = surface area * number of objects inside
   * This cost function forces overbalancing
@@ -174,7 +174,7 @@ let rec build_bb_tree_aux2 scene (bb_min,bb_max) obj_array order_x order_y order
 	      | Some (_,split_data) -> split_data
  in let n = Array.length obj_array
  in let (order,left_size,bb_left,bb_right) = split
- 
+
  in let split_order_rev = Array.make n (-1)
  in let _ = for i = 0 to n-1 do split_order_rev.(order.(i)) <- i  done
  in let right_size = n - left_size
