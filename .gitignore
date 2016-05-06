@@ -43,6 +43,7 @@ slcompiler_minimal/slcompiler
 slcompiler_old/slcompiler
 
 # Compiled data
-bunny-compiled.dat
-triangles.dat
-triangles.raw
+hardware_emulator/*.shr
+hardware_emulator/*.dat
+hardware_emulator/*.raw
+hardware_emulator/*.pnm
