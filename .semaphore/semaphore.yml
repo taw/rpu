@@ -1,0 +1,19 @@
+version: v1.0
+name: Initial Pipeline
+agent:
+  machine:
+    type: e1-standard-2
+    os_image: ubuntu2004
+blocks:
+  - name: 'Block #1'
+    task:
+      jobs:
+        - name: 'Job #1'
+          commands:
+            - sudo apt install -y ocaml camlp4
+            - checkout
+            - bundle install
+            - bundle exec rake build
+            - '# These depend on ocaml-ioxml which doesn''t seem to be in ubuntu repo any more'
+            - '# (cd kdsaveload; make)'
+            - '# (cd ioxml; make)'
